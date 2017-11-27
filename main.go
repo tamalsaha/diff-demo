@@ -54,6 +54,10 @@ func main() {
 			if err != nil {
 				log.Fatalln(err)
 			}
+			patch, err = yaml.JSONToYAML(patch)
+			if err != nil {
+				log.Fatalln(err)
+			}
 			fmt.Println(string(patch))
 		},
 	}
