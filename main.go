@@ -28,7 +28,7 @@ func main() {
 		Run: func(cmd *cobra.Command, args []string) {
 			srcYAML, err := ioutil.ReadFile(src)
 			if err != nil {
-				log.Fatalln(err)
+				log.Fatalf("failed to read %s. Reason: %s", src, err)
 			}
 			srcJson, err := yaml.YAMLToJSON(srcYAML)
 			if err != nil {
@@ -37,7 +37,7 @@ func main() {
 
 			dstYAML, err := ioutil.ReadFile(dst)
 			if err != nil {
-				log.Fatalln(err)
+				log.Fatalf("failed to read %s. Reason: %s", dst, err)
 			}
 			dstJson, err := yaml.YAMLToJSON(dstYAML)
 			if err != nil {
