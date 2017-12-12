@@ -14,8 +14,6 @@ spec:
       annotations:
         scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
-      nodeSelector:
-        node-role.kubernetes.io/master: ""
       containers:
       - name: voyager
         args:
@@ -24,7 +22,8 @@ spec:
         - --cloud-provider=$CLOUD_PROVIDER
         - --cloud-config=$CLOUD_CONFIG # ie. /etc/kubernetes/azure.json for azure
         - --ingress-class=$INGRESS_CLASS
-        image: appscode/voyager:5.0.0-rc.3
+        - --custom-templates=/srv/voyager/custom/*.cfg
+        image: appscode/voyager:5.0.0-rc.6
         ports:
         - containerPort: 56790
           name: ops
@@ -36,13 +35,16 @@ spec:
           - mountPath: /etc/kubernetes
             name: cloudconfig
             readOnly: true
+          - mountPath: /srv/voyager/custom
+            name: templates
+            readOnly: true
       volumes:
         - hostPath:
             path: /etc/kubernetes
           name: cloudconfig
+        - configMap:
+            name: voyager-templates
+          name: templates
       tolerations:
       - key: CriticalAddonsOnly
         operator: Exists
-      - key: node-role.kubernetes.io/master
-        operator: Exists
-        effect: NoSchedule
