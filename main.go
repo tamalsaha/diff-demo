@@ -5,12 +5,13 @@ import (
 	"io/ioutil"
 	"log"
 	"strings"
-
+	core "k8s.io/api/core/v1"
 	"github.com/ghodss/yaml"
 	"github.com/spf13/cobra"
-	apps "k8s.io/api/apps/v1beta1"
+	// apps "k8s.io/api/apps/v1beta1"
 	"k8s.io/apimachinery/pkg/util/jsonmergepatch"
 	"k8s.io/apimachinery/pkg/util/strategicpatch"
+	"github.com/tamalsaha/go-oneliners"
 )
 
 var patchTypes = []string{"json", "merge", "strategic"}
@@ -28,34 +29,40 @@ func main() {
 		Run: func(cmd *cobra.Command, args []string) {
 			srcYAML, err := ioutil.ReadFile(src)
 			if err != nil {
+				oneliners.FILE(err)
 				log.Fatalf("failed to read %s. Reason: %s", src, err)
 			}
 			srcJson, err := yaml.YAMLToJSON(srcYAML)
 			if err != nil {
+				oneliners.FILE(err)
 				log.Fatalln(err)
 			}
 
 			dstYAML, err := ioutil.ReadFile(dst)
 			if err != nil {
+				oneliners.FILE(err)
 				log.Fatalf("failed to read %s. Reason: %s", dst, err)
 			}
 			dstJson, err := yaml.YAMLToJSON(dstYAML)
 			if err != nil {
+				oneliners.FILE(err)
 				log.Fatalln(err)
 			}
 
 			var patch []byte
 			switch t {
 			case "strategic":
-				patch, err = strategicpatch.CreateTwoWayMergePatch(srcJson, dstJson, apps.Deployment{})
+				patch, err = strategicpatch.CreateTwoWayMergePatch(srcJson, dstJson, core.Pod{})
 			case "merge":
 				patch, err = jsonmergepatch.CreateThreeWayJSONMergePatch(srcJson, dstJson, srcJson)
 			}
 			if err != nil {
+				oneliners.FILE(err)
 				log.Fatalln(err)
 			}
 			patch, err = yaml.JSONToYAML(patch)
 			if err != nil {
+				oneliners.FILE(err)
 				log.Fatalln(err)
 			}
 			fmt.Println(string(patch))
