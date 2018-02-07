@@ -9,6 +9,7 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/spf13/cobra"
 	apps "k8s.io/api/apps/v1beta1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/jsonmergepatch"
 	"k8s.io/apimachinery/pkg/util/strategicpatch"
 )
@@ -44,10 +45,13 @@ func main() {
 				log.Fatalln(err)
 			}
 
+			var rt runtime.Object
+			rt = &apps.Deployment{}
+
 			var patch []byte
 			switch t {
 			case "strategic":
-				patch, err = strategicpatch.CreateTwoWayMergePatch(srcJson, dstJson, apps.Deployment{})
+				patch, err = strategicpatch.CreateTwoWayMergePatch(srcJson, dstJson, rt)
 			case "merge":
 				patch, err = jsonmergepatch.CreateThreeWayJSONMergePatch(srcJson, dstJson, srcJson)
 			}
